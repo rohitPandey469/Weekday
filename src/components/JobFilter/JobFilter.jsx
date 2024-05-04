@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchJobsBasedOnFilter } from "../../actions/jobActions";
 
-const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams}) => {
+const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const isFormFilled = Object.values(filterParams).some(
-      (value) => value.trim().length > 0
+      (value) => value.length > 0
     );
+    console.log("Is form filled", isFormFilled);
     setIsFormFilled(isFormFilled);
   }, [filterParams]);
 
@@ -21,6 +22,7 @@ const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams}) => {
   };
 
   const handleSubmit = () => {
+    console.log("Fetch Jobs based on filter!!!", filterParams);
     dispatch(fetchJobsBasedOnFilter(filterParams, 0)); // Assuming offset value is 0 initially
   };
 
@@ -28,12 +30,22 @@ const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams}) => {
     <div>
       <label>
         Job Role:
-        <input
-          type="text"
+        <select
           name="jobRole"
-          value={filterParams.jobRole}
-          onChange={handleChange}
-        />
+          onChange={(e) =>
+            setFilterParams((prevParams) => ({
+              ...prevParams,
+              jobRole: e.target.value == "" ? [] : [e.target.value],
+            }))
+          }
+        >
+          <option value="">Select Job Role</option>
+          {["frontend", "backend", "UI/UX designer"].map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
       </label>
       <label>
         Minimum Experience:
@@ -77,6 +89,15 @@ const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams}) => {
           type="text"
           name="stack"
           value={filterParams.stack}
+          onChange={handleChange}
+        />
+      </label>
+      <label>
+        Company Name:
+        <input
+          type="text"
+          name="companyName"
+          value={filterParams.companyName}
           onChange={handleChange}
         />
       </label>

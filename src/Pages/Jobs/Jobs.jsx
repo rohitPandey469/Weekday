@@ -10,14 +10,15 @@ const Jobs = () => {
     (state) => state.jobReducer
   );
   const [isFetching, setIsFetching] = useState(false);
-  // const [isFormFilled, setIsFormFilled] = useState(false);
+  const [isFormFilled, setIsFormFilled] = useState(false);
   const [filterParams, setFilterParams] = useState({
-    jobRole: "",
+    jobRole: [],
     minExp: "",
     location: "",
     minJdSalary: "",
     remote: "",
     stack: "",
+    companyName: "",
   });
 
   useEffect(() => {
@@ -35,14 +36,25 @@ const Jobs = () => {
         !loading &&
         jobs.length < totalCount
       ) {
-        console.log("Fetching more jobs");
-        setIsFetching(true);
+        console.log("Is Form Filled ? ", isFormFilled);
+        if (isFormFilled) {
+          // fetch the jobs with filter
+          dispatch(
+            fetchJobsBasedOnFilter(
+              filterParams,
+              localStorage.getItem("checkedTillWhat")
+            )
+          );
+        } else {
+          console.log("Fetching more jobs");
+          setIsFetching(true);
+        }
       }
     }
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isFetching, loading]);
+  }, [isFetching, loading, isFormFilled, filterParams]);
 
   useEffect(() => {
     if (!isFetching) return;
@@ -50,21 +62,24 @@ const Jobs = () => {
     setIsFetching(false);
   }, [isFetching, dispatch, jobs.length]);
 
-  // useEffect(() => {
-  //   if (isFormFilled) {
-  //     console.log("Fetch Jobs Based On Filter Action Called");
-  //     dispatch(fetchJobsBasedOnFilter(filterParams, 0)); // humesha 0 se start kar
-  //   } else {
-  //     console.log("Fetch Jobs Action Called");
-  //     dispatch(fetchJobs(0));
-  //   }
-  // }, [isFormFilled, setIsFormFilled]);
-
-  // check if there
+  useEffect(() => {
+    if (isFormFilled) {
+      console.log("Fetch Jobs Based on filter offset 0");
+      dispatch(fetchJobsBasedOnFilter(filterParams, 0));
+    } else {
+      console.log("Fetch jobs offset 0");
+      dispatch(fetchJobs(0));
+      localStorage.removeItem("checkedTillWhat");
+    }
+  }, [isFormFilled, filterParams]);
 
   return (
     <>
-      <JobFilter setIsFormFilled={setIsFormFilled} filterParams={filterParams} setFilterParams={setFilterParams}/>
+      <JobFilter
+        setIsFormFilled={setIsFormFilled}
+        filterParams={filterParams}
+        setFilterParams={setFilterParams}
+      />
       <div>
         {loading ? (
           <div style={{ color: "red", fontSize: "40px" }}>Loading...</div>

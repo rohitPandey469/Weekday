@@ -67,6 +67,7 @@ export const fetchJobs = (offsetValue) => {
 // Asycn action creator to fetch jobs based on filter
 export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
   return async (dispatch, getState) => {
+    console.log("Fetching Started", offsetValue);
     try {
       const {
         minExp,
@@ -80,7 +81,7 @@ export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
 
       // need to do the filtering on client side
       let filteredJobs = [];
-      const result = await fetchJobsFunc(offsetValue, 10000); // fetched all data
+      const result = await fetchJobsFunc(offsetValue, 100); // fetched all data
       const totalJobs = result.jdList;
       for (let i = 0; i < totalJobs.length; i++) {
         let job = totalJobs[i];
@@ -91,18 +92,27 @@ export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
         )
           continue;
         if (jobRole.length > 0 && !jobRole.includes(job.jobRole)) continue;
-        if (minExp.length > 0 && minExp < job.minExp) continue;
+        if (minExp > 0 && minExp < job.minExp) continue;
         if (minJdSalary.length > 0 && minJdSalary < job.minJdSalary) continue;
         if (companyName.length > 0 && companyName != job.companyName) continue;
 
         filteredJobs.push(job);
         if (filteredJobs.length >= 10) {
-          localStorage.setItem("checkedTillWhat", i);
+          localStorage.setItem("checkedTillWhat", parseInt(offsetValue) + i);
           break;
         }
       }
+
+      console.log("Filtered Jobs", filteredJobs);
+      if (offsetValue == 0) {
+        dispatch(fetchJobsSuccess(filteredJobs, result.totalCount));
+      }
       const currentState = getState();
       const updatedJobs = [...currentState.jobReducer.jobs, ...filteredJobs];
+      if (updatedJobs.length == 0) {
+        dispatch(fetchJobsBasedOnFilterFailure("No data found"));
+        return;
+      }
       dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
       dispatch(fetchJobsBasedOnFilterFailure(error.message));
