@@ -1,3 +1,4 @@
+import { fetchJobsFunc } from "../utils/fetchJobsFunc";
 import {
   FETCH_JOBS_BASED_ON_FILTER_FAILURE,
   FETCH_JOBS_BASED_ON_FILTER_SUCCESS,
@@ -47,33 +48,13 @@ export const fetchJobsBasedOnFilterFailure = (error) => {
 export const fetchJobs = (offsetValue) => {
   return async (dispatch, getState) => {
     try {
-      // Jobs fetch Logic
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+      const result = await fetchJobsFunc(offsetValue, 10); // { offsetValue, limitValue }
 
-      const body = JSON.stringify({
-        limit: 10,
-        offset: offsetValue,
-      });
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body,
-      };
-
-      const response = await fetch(
-        "https://api.weekday.technology/adhoc/getSampleJdJSON",
-        requestOptions
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch jobs");
+      if (offsetValue == 0) {
+        dispatch(fetchJobsSuccess(result.jdList, result.totalCount));
+        return;
       }
-
-      const result = await response.json();
-
-      // Concate new jobs to existing ones
+      // Concate new jobs to existing ones if offsetValue doesn't equals to zero
       const currentState = getState();
       const updatedJobs = [...currentState.jobReducer.jobs, ...result.jdList];
       dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
@@ -84,11 +65,45 @@ export const fetchJobs = (offsetValue) => {
 };
 
 // Asycn action creator to fetch jobs based on filter
-export const fetchJobsBasedOnFilter = (filterParams) => {
-  return async (dispatch) => {
+export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
+  return async (dispatch, getState) => {
     try {
-      const { location, minExp, companyName, techStack, role, minPay } =
-        filterParams;
+      const {
+        minExp,
+        companyName,
+        location,
+        jobRole,
+        minJdSalary,
+        remote,
+        stack,
+      } = filterParams;
+
+      // need to do the filtering on client side
+      let filteredJobs = [];
+      const result = await fetchJobsFunc(offsetValue, 10000); // fetched all data
+      const totalJobs = result.jdList;
+      for (let i = 0; i < totalJobs.length; i++) {
+        let job = totalJobs[i];
+        // filter
+        if (
+          location.length > 0 &&
+          job.location.toLowerCase() !== location.toLowerCase()
+        )
+          continue;
+        if (jobRole.length > 0 && !jobRole.includes(job.jobRole)) continue;
+        if (minExp.length > 0 && minExp < job.minExp) continue;
+        if (minJdSalary.length > 0 && minJdSalary < job.minJdSalary) continue;
+        if (companyName.length > 0 && companyName != job.companyName) continue;
+
+        filteredJobs.push(job);
+        if (filteredJobs.length >= 10) {
+          localStorage.setItem("checkedTillWhat", i);
+          break;
+        }
+      }
+      const currentState = getState();
+      const updatedJobs = [...currentState.jobReducer.jobs, ...filteredJobs];
+      dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
       dispatch(fetchJobsBasedOnFilterFailure(error.message));
     }
