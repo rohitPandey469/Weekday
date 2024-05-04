@@ -6,10 +6,19 @@ import {
 } from "./actionType/actionType";
 
 // Action creators
-export const fetchJobsSuccess = (jobs) => {
+export const fetchJobsSuccess = (jobs, totalCount) => {
+  // to avoid duplicates - if present
+  const jobIds = new Set(jobs.map((job) => job.jdUid));
+  const uniqueJobs = [];
+  jobs.forEach((job) => {
+    if (jobIds.has(job.jdUid)) {
+      uniqueJobs.push(job);
+      jobIds.delete(job.jdUid);
+    }
+  });
   return {
     type: FETCH_JOBS_SUCCESS,
-    payload: jobs,
+    payload: { jobs: uniqueJobs, totalCount },
   };
 };
 
@@ -20,10 +29,10 @@ export const fetchJobsFailure = (error) => {
   };
 };
 
-export const fetchJobsBasedOnFilterSuccess = (jobs) => {
+export const fetchJobsBasedOnFilterSuccess = (jobs, totalCount) => {
   return {
     type: FETCH_JOBS_BASED_ON_FILTER_SUCCESS,
-    payload: jobs,
+    payload: { jobs, totalCount },
   };
 };
 
@@ -35,8 +44,8 @@ export const fetchJobsBasedOnFilterFailure = (error) => {
 };
 
 // Async Action creator to fetch all the jobs
-export const fetchJobs = () => {
-  return async (dispatch) => {
+export const fetchJobs = (offsetValue) => {
+  return async (dispatch, getState) => {
     try {
       // Jobs fetch Logic
       const myHeaders = new Headers();
@@ -44,7 +53,7 @@ export const fetchJobs = () => {
 
       const body = JSON.stringify({
         limit: 10,
-        offset: 0,
+        offset: offsetValue,
       });
 
       const requestOptions = {
@@ -63,7 +72,11 @@ export const fetchJobs = () => {
       }
 
       const result = await response.json();
-      dispatch(fetchJobsSuccess(result.jdList));
+
+      // Concate new jobs to existing ones
+      const currentState = getState();
+      const updatedJobs = [...currentState.jobReducer.jobs, ...result.jdList];
+      dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
       dispatch(fetchJobsFailure(error.message));
     }
@@ -74,10 +87,8 @@ export const fetchJobs = () => {
 export const fetchJobsBasedOnFilter = (filterParams) => {
   return async (dispatch) => {
     try {
-      // Implement your filtering logic here
-      // Example: const response = await axios.get(`your_api_endpoint?location=${filterParams.location}&minExp=${filterParams.minExp}&jobRole=${filterParams.jobRole}`);
-      // Dispatch success action with filtered jobs data
-      // dispatch(fetchJobsBasedOnFilterSuccess(response.data));
+      const { location, minExp, companyName, techStack, role, minPay } =
+        filterParams;
     } catch (error) {
       dispatch(fetchJobsBasedOnFilterFailure(error.message));
     }

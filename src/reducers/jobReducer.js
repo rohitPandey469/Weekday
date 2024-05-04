@@ -7,6 +7,7 @@ import {
 
 const initialState = {
   jobs: [],
+  totalCount: 0,
   loading: true,
   error: null,
 };
@@ -16,7 +17,8 @@ const jobReducer = (state = initialState, action) => {
     case FETCH_JOBS_SUCCESS:
       return {
         ...state,
-        jobs: action.payload,
+        jobs: action.payload.jobs,
+        totalCount: action.payload.totalCount,
         loading: false,
         error: null,
       };
@@ -24,13 +26,15 @@ const jobReducer = (state = initialState, action) => {
       return {
         ...state,
         jobs: [],
+        totalCount: 0,
         loading: false,
         error: action.payload,
       };
     case FETCH_JOBS_BASED_ON_FILTER_SUCCESS:
       return {
         ...state,
-        jobs: action.payload,
+        jobs: action.payload.jobs,
+        totalCount: action.payload.totalCount,
         loading: false,
         error: null,
       };
@@ -38,6 +42,7 @@ const jobReducer = (state = initialState, action) => {
       return {
         ...state,
         jobs: [],
+        totalCount: 0,
         loading: false,
         error: action.payload,
       };
