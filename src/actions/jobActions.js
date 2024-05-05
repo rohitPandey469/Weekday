@@ -33,7 +33,7 @@ export const fetchJobsFailure = (error) => {
 };
 
 // Async Action creator to fetch all the jobs
-export const fetchJobs = (offsetValue) => {
+export const fetchJobs = (offsetValue, loaderOff) => {
   return async (dispatch, getState) => {
     try {
       const result = await fetchJobsFunc(offsetValue, 10); // { offsetValue, limitValue }
@@ -48,12 +48,18 @@ export const fetchJobs = (offsetValue) => {
       dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
       dispatch(fetchJobsFailure(error.message));
+    } finally {
+      loaderOff();
     }
   };
 };
 
 // Asycn action creator to fetch jobs based on filter
-export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
+export const fetchJobsBasedOnFilter = (
+  filterParams,
+  offsetValue,
+  loaderOff
+) => {
   return async (dispatch, getState) => {
     console.log("Fetching Started", offsetValue);
     try {
@@ -81,7 +87,7 @@ export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
           continue;
         if (jobRole.length > 0 && !jobRole.includes(job.jobRole)) continue;
         if (minExp > 0 && minExp < job.minExp) continue;
-        if (minJdSalary.length > 0 && minJdSalary < job.minJdSalary) continue;
+        if (minJdSalary && minJdSalary > job.minJdSalary) continue;
         if (companyName.length > 0 && companyName != job.companyName) continue;
 
         filteredJobs.push(job);
@@ -104,6 +110,8 @@ export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
       dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
       dispatch(fetchJobsFailure(error.message));
+    } finally {
+      loaderOff();
     }
   };
 };

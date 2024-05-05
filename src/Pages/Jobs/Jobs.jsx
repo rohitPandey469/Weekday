@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchJobs, fetchJobsBasedOnFilter } from "../../actions/jobActions";
 import JobFilter from "../../components/JobFilter/JobFilter";
 import JobCard from "../../components/JobCard/JobCard";
+import Loader from "../../components/Loader/Loader";
 
 const Jobs = () => {
   const dispatch = useDispatch();
@@ -21,10 +22,12 @@ const Jobs = () => {
     stack: "",
     companyName: "",
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const loaderOff = () => setIsLoading(false);
 
   useEffect(() => {
     console.log("Initial Fetch...");
-    dispatch(fetchJobs(0)); // first time offset 0
+    dispatch(fetchJobs(0, loaderOff)); // first time offset 0
   }, [dispatch]);
 
   useEffect(() => {
@@ -40,10 +43,13 @@ const Jobs = () => {
         console.log("Is Form Filled ? ", isFormFilled);
         if (isFormFilled) {
           // fetch the jobs with filter
+          // no need to on Loader here - cause then initial data will be not shown and 
+          // we don't want that
           dispatch(
             fetchJobsBasedOnFilter(
               filterParams,
-              localStorage.getItem("checkedTillWhat")
+              localStorage.getItem("checkedTillWhat"),
+              loaderOff
             )
           );
         } else {
@@ -59,17 +65,18 @@ const Jobs = () => {
 
   useEffect(() => {
     if (!isFetching) return;
-    dispatch(fetchJobs(jobs.length));
+    dispatch(fetchJobs(jobs.length, loaderOff));
     setIsFetching(false);
   }, [isFetching, dispatch, jobs.length]);
 
   useEffect(() => {
+    setIsLoading(true);
     if (isFormFilled) {
       console.log("Fetch Jobs Based on filter offset 0");
-      dispatch(fetchJobsBasedOnFilter(filterParams, 0));
+      dispatch(fetchJobsBasedOnFilter(filterParams, 0, loaderOff));
     } else {
       console.log("Fetch jobs offset 0");
-      dispatch(fetchJobs(0));
+      dispatch(fetchJobs(0, loaderOff));
       localStorage.removeItem("checkedTillWhat");
     }
   }, [isFormFilled, filterParams]);
@@ -82,14 +89,17 @@ const Jobs = () => {
         setFilterParams={setFilterParams}
       />
       <div className={styles.container}>
-        {loading ? (
-          <div style={{ color: "red", fontSize: "40px" }}>Loading...</div>
+        {loading || isLoading ? (
+          <Loader />
         ) : (
           <div>
             {error ? (
-              <div style={{ color: "red", fontSize: "20px" }}>
-                Error: {error}
-              </div>
+              <>
+                <div style={{ color: "blue", fontSize: "20px" }}>
+                  Loading will take some time or {error}
+                </div>
+                <Loader />
+              </>
             ) : (
               <div>
                 <div className={styles.jobcardcontainer}>
@@ -98,9 +108,11 @@ const Jobs = () => {
                   ))}
                 </div>
                 <div style={{ color: "blue", fontSize: "20px" }}>
-                  {jobs.length <= totalCount
-                    ? "Loading..."
-                    : "No more jobs available..."}
+                  {jobs.length <= totalCount ? (
+                    <Loader />
+                  ) : (
+                    "No more jobs available..."
+                  )}
                 </div>
               </div>
             )}

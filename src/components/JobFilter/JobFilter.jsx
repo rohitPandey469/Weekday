@@ -71,53 +71,69 @@ const JobFilter = ({ setIsFormFilled, filterParams, setFilterParams }) => {
     });
   };
 
-  // const handleCompanyNameChange = (selectedOption) => {
-  //   setFilterParams({
-  //     ...filterParams,
-  //     companyName: selectedOption.value, // Assuming companyName is a string
-  //   });
-  // };
+  const handleCompanyNameChange = (e) => {
+    setFilterParams({
+      ...filterParams,
+      companyName: e.target.value ? e.target.value : "", // Assuming companyName is a string
+    });
+  };
 
   return (
-    <>
-      <Select
-        options={GroupedOptionsForRoles}
-        placeholder="Roles"
-        isMulti
-        isClearable
-        onChange={handleRoleChange}
-      />
-      <Select
-        options={OptionsForExp}
-        placeholder="Experience"
-        isClearable
-        onChange={handleExpChange}
-      />
-      <Select
-        options={OptionsForLocation}
-        placeholder="Location"
-        isClearable
-        onChange={handleLocationChange}
-      />
-      <Select
-        options={OptionsForPay}
-        placeholder="Minimum Base Pay Salary"
-        isClearable
-        onChange={handlePayChange}
-      />
-      <Select
-        options={OptionsForRemote}
-        placeholder="Remote"
-        isClearable
-        onChange={handleRemoteChange}
-      />
-      <Select
-        options={OptionsForStack}
-        placeholder="Stack"
-        isClearable
-        onChange={handleStackChange}
-      />
-    </>
+    <div className={styles.container}>
+      <div className={styles.innercontainer}>
+        <Select
+          className={styles.selectinput}
+          options={GroupedOptionsForRoles}
+          placeholder="Roles"
+          isMulti
+          isClearable
+          onChange={handleRoleChange}
+        />
+        <Select
+          className={styles.selectinput}
+          options={OptionsForExp}
+          placeholder="Experience"
+          isClearable
+          onChange={handleExpChange}
+        />
+        <Select
+          className={styles.selectinput}
+          options={OptionsForLocation}
+          placeholder="Location"
+          isClearable
+          onChange={handleLocationChange}
+        />
+        <Select
+          className={styles.selectinput}
+          options={OptionsForPay}
+          placeholder="Minimum Base Pay Salary"
+          isClearable
+          onChange={handlePayChange}
+        />
+        <Select
+          className={styles.selectinput}
+          options={OptionsForRemote}
+          placeholder="Remote"
+          isClearable
+          onChange={handleRemoteChange}
+        />
+        <Select
+          className={styles.selectinput}
+          options={OptionsForStack}
+          placeholder="Stack"
+          isClearable
+          onChange={handleStackChange}
+        />
+        <input
+          type="text"
+          name="companyName"
+          onChange={handleCompanyNameChange}
+          placeholder="Search Company Name"
+          value={filterParams.companyName}
+          className={styles.company}
+        />
+      </div>
+    </div>
   );
 };
 
