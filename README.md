@@ -1,8 +1,11 @@
-# React + Vite
+# Weekday - Steps for setup
+Step-1: git clone url
+Step-2: npm install or yarn install
+Step-3: npm run dev
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Important-
+1. The Filter takes little time to load - so please wait.
+2. The Remote and Stack filter doesn't work as not provided in the API
+3. Deployed link : [https://weekday-task.netlify.app/](https://weekday-task.netlify.app)
+4. Posted 12 days ago is only fixed data in the whole page
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
