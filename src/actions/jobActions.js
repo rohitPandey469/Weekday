@@ -1,7 +1,5 @@
 import { fetchJobsFunc } from "../utils/fetchJobsFunc";
 import {
-  FETCH_JOBS_BASED_ON_FILTER_FAILURE,
-  FETCH_JOBS_BASED_ON_FILTER_SUCCESS,
   FETCH_JOBS_FAILURE,
   FETCH_JOBS_SUCCESS,
 } from "./actionType/actionType";
@@ -19,27 +17,17 @@ export const fetchJobsSuccess = (jobs, totalCount) => {
   });
   return {
     type: FETCH_JOBS_SUCCESS,
-    payload: { jobs: uniqueJobs, totalCount },
+    payload: {
+      jobs: uniqueJobs,
+      totalCount,
+      error: jobs.length > 0 ? null : "No Jobs Available at the moment!",
+    },
   };
 };
 
 export const fetchJobsFailure = (error) => {
   return {
     type: FETCH_JOBS_FAILURE,
-    payload: error,
-  };
-};
-
-export const fetchJobsBasedOnFilterSuccess = (jobs, totalCount) => {
-  return {
-    type: FETCH_JOBS_BASED_ON_FILTER_SUCCESS,
-    payload: { jobs, totalCount },
-  };
-};
-
-export const fetchJobsBasedOnFilterFailure = (error) => {
-  return {
-    type: FETCH_JOBS_BASED_ON_FILTER_FAILURE,
     payload: error,
   };
 };
@@ -110,12 +98,12 @@ export const fetchJobsBasedOnFilter = (filterParams, offsetValue) => {
       const currentState = getState();
       const updatedJobs = [...currentState.jobReducer.jobs, ...filteredJobs];
       if (updatedJobs.length == 0) {
-        dispatch(fetchJobsBasedOnFilterFailure("No data found"));
+        dispatch(fetchJobsFailure("No data found"));
         return;
       }
       dispatch(fetchJobsSuccess(updatedJobs, result.totalCount));
     } catch (error) {
-      dispatch(fetchJobsBasedOnFilterFailure(error.message));
+      dispatch(fetchJobsFailure(error.message));
     }
   };
 };

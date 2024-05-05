@@ -3,6 +3,7 @@ import styles from "./Jobs.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJobs, fetchJobsBasedOnFilter } from "../../actions/jobActions";
 import JobFilter from "../../components/JobFilter/JobFilter";
+import JobCard from "../../components/JobCard/JobCard";
 
 const Jobs = () => {
   const dispatch = useDispatch();
@@ -80,21 +81,22 @@ const Jobs = () => {
         filterParams={filterParams}
         setFilterParams={setFilterParams}
       />
-      <div>
+      <div className={styles.container}>
         {loading ? (
           <div style={{ color: "red", fontSize: "40px" }}>Loading...</div>
         ) : (
           <div>
             {error ? (
-              <div>Error: {error.message}</div>
+              <div style={{ color: "red", fontSize: "20px" }}>
+                Error: {error}
+              </div>
             ) : (
               <div>
-                {jobs.map((job) => (
-                  <div key={job.jdUid} style={{ border: "10px solid red" }}>
-                    <h2>{job.jobRole}</h2>
-                    <p>{job.companyName}</p>
-                  </div>
-                ))}
+                <div className={styles.jobcardcontainer}>
+                  {jobs.map((job) => (
+                    <JobCard job={job} />
+                  ))}
+                </div>
                 <div style={{ color: "blue", fontSize: "20px" }}>
                   {jobs.length <= totalCount
                     ? "Loading..."

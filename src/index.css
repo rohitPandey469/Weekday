@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: __LexendFont_7838d2;
+  src: url(/_next/static/media/861e8681f94a9f25-s.p.woff2) format("woff2");
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: __LexendFont_7838d2;
+  src: url(/_next/static/media/235296e2549a9ad4-s.p.woff2) format("woff2");
+  font-display: swap;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: __LexendFont_7838d2;
+  src: url(/_next/static/media/0f77410be37d9591-s.p.woff2) format("woff2");
+  font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: __LexendFont_7838d2;
+  src: url(/_next/static/media/a369c357e425fb44-s.p.woff2) format("woff2");
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: __LexendFont_Fallback_7838d2;
+  src: local("Arial");
+  ascent-override: 93.16%;
+  descent-override: 23.29%;
+  line-gap-override: 0%;
+  size-adjust: 107.34%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+body {
+  font-family: "__LexendFont_7838d2", Arial, sans-serif;
+}

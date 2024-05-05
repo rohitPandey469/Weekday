@@ -1,0 +1,12 @@
+.container{
+    display: flex;
+    justify-content: center;
+}
+.jobcardcontainer {
+  display: flex;
+  max-width: 1220px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 1rem;
+}
